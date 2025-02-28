@@ -1,0 +1,23 @@
+List of the features 
+Add New Task:-
+Allows users to add new tasks with a task description and priority level (High, Medium, Low).
+Input fields validate that tasks cannot be empty.
+
+Edit Existing Task:-
+Users can edit existing tasks by modifying the text and priority.
+Tasks can be updated by selecting the "Edit" button.
+
+Delete Task:-
+Users can delete tasks from the to-do list.
+The "Delete" button next to each task enables this action.
+
+Mark Tasks as Completed:-
+Tasks can be marked as completed by tapping on the task text.
+Completed tasks are visually distinguished with a strikethrough and color change.
+
+Task Prioritization:-
+Tasks are assigned one of three priority levels: High, Medium, or Low.
+The priority level is selectable from a drop-down menu.
+
+Sort Tasks by Priority:-
+The tasks are automatically sorted by their priority (High > Medium > Low) to ensure more important tasks appear at the top.

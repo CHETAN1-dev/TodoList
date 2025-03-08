@@ -1,10 +1,10 @@
 // src/Taskcount.js
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { useGetTasksQuery } from '../redux/api/taskApi';
+import {View, Text, StyleSheet} from 'react-native';
+import {useTasks} from '../redux/api/taskApi';
 
 const TaskCount = () => {
-  const { data: tasks = [] } = useGetTasksQuery();
+  const {data: tasks = []} = useTasks();
 
   return (
     <View style={styles.container}>
@@ -25,4 +25,3 @@ const styles = StyleSheet.create({
 });
 
 export default TaskCount;
-

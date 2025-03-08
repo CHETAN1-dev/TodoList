@@ -2,12 +2,12 @@ import React from 'react';
 import {AppRegistry} from 'react-native';
 import {name as appName} from './app.json'
 import App from './src/component/App';
-import {Provider} from 'react-redux';
-import store from './src/redux/api/store';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const queryClient = new QueryClient();
 
 const Appreducer = () =>(
-    <Provider store={store}>
+    <QueryClientProvider client={queryClient}>
         <App/>
-    </Provider>
+</QueryClientProvider>
 );
 AppRegistry.registerComponent(appName ,()=> Appreducer )

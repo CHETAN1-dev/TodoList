@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, Button, TouchableOpacity, StyleSheet } from 'react-native';
 
-const TaskItem = ({ task, onToggleCompletion, onDeleteTask }) => {
+const TaskItem = ({ task, onToggleCompletion, onDeleteTask, onEditTask }) => {
   return (
     <View style={styles.taskContainer}>
       <TouchableOpacity style={styles.taskTextContainer} onPress={onToggleCompletion}>
@@ -12,6 +12,7 @@ const TaskItem = ({ task, onToggleCompletion, onDeleteTask }) => {
         <Text style={styles.priorityText}>Priority: {task.priority}</Text>
       </TouchableOpacity>
       <View style={styles.taskActions}>
+      <Button title="Edit" color="blue" onPress={onEditTask} />
         <Button title="Delete" color="red" onPress={onDeleteTask} />
       </View>
     </View>

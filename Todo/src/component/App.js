@@ -1,50 +1,102 @@
-// src/App.js
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, StyleSheet } from 'react-native';
-import { useGetTasksQuery, useAddTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation } from '../redux/api/taskApi';
+import React, {useState} from 'react';
+import {
+  SafeAreaView,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  View,
+} from 'react-native';
+import {
+  useTasks,
+  useAddTask,
+  useUpdateTask,
+  useDeleteTask,
+} from '../redux/api/taskApi';
 import TaskForm from './Taskform';
-import TaskList from './Tasklist';
 import TaskCount from './Taskcount';
-import Quote from './Quote';
-
+import TaskItem from './Taskitem';
+import { queryClient } from '@tanstack/react-query';
 const App = () => {
-  const { data: tasks = [], refetch } = useGetTasksQuery();
-  const [addTask] = useAddTaskMutation();
-  const [updateTask] = useUpdateTaskMutation();
-  const [deleteTask] = useDeleteTaskMutation();
+  const {data: tasks = [], isLoading} = useTasks();
+  const addTaskMutation = useAddTask();
+  const updateTaskMutation = useUpdateTask();
+  const deleteTaskMutation = useDeleteTask();
 
   const [taskText, setTaskText] = useState('');
   const [selectedPriority, setSelectedPriority] = useState('Medium');
   const [editingTaskId, setEditingTaskId] = useState(null);
-
-  useEffect(() => {
-    if (editingTaskId) {
-      const taskToEdit = tasks.find(task => task.id === editingTaskId);
-      if (taskToEdit) {
-        setTaskText(taskToEdit.text);
-        setSelectedPriority(taskToEdit.priority);
-      }
-    }
-  }, [editingTaskId, tasks]);
+  const [error, setError] = useState('');
 
   const onAddTask = async () => {
-    if (taskText.trim()) {
-      if (editingTaskId) {
-        await updateTask({ id: editingTaskId, text: taskText, priority: selectedPriority });
-      } else {
-        await addTask({ id: Date.now().toString(), text: taskText, completed: false, priority: selectedPriority });
-      }
-      setTaskText('');
-      setSelectedPriority('Medium');
-      setEditingTaskId(null);
-      refetch();
+    if (!taskText.trim()) {
+      setError('Task cannot be empty');
+      return;
+    }
+
+    if (editingTaskId) {
+       updateTaskMutation.mutate(
+        {
+          id: editingTaskId,
+          text: taskText,
+          priority: selectedPriority,
+        },
+        {
+          onSuccess: () => {
+            clearForm();
+          },
+        },
+      );
     } else {
-      alert('Task cannot be empty');
+      // Add New Task
+      addTaskMutation.mutate(
+        {
+          id: Date.now().toString(),
+          text: taskText,
+          completed: false,
+          priority: selectedPriority,
+        },
+        {
+          onSuccess: () => {
+            clearForm();
+          },
+        },
+      );
     }
   };
 
-  const onEditTask = (id) => setEditingTaskId(id);
-  const onDeleteTask = async (id) => { await deleteTask(id); refetch(); };
+  // Handle Task Edit
+  const onEditTask = id => {
+    const task = tasks.find(task => task.id === id);
+    setTaskText(task.text);
+    setSelectedPriority(task.priority);
+    setEditingTaskId(id);
+  };
+
+  // Handle Task Delete
+  const onDeleteTask = id => {
+    deleteTaskMutation.mutate(id, {
+      onSuccess: () => {
+        queryClient.setQueryData(['tasks'], old =>
+          old.filter(task => task.id !== id),
+        );
+      },
+    });
+  };
+  const clearForm = () => {
+    setTaskText('');
+    setSelectedPriority('Medium');
+    setEditingTaskId(null);
+    setError('');
+  };
+
+    if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,17 +108,45 @@ const App = () => {
         setSelectedPriority={setSelectedPriority}
         onAddTask={onAddTask}
         editingTaskId={editingTaskId}
+        error={error}
       />
       <TaskCount taskCount={tasks.length} />
-      <TaskList tasks={tasks} onEditTask={onEditTask} onDeleteTask={onDeleteTask} />
-      <Quote />
+
+       <FlatList
+        data={tasks}
+        keyExtractor={item => item.id}
+        renderItem={({item}) => (
+          <TaskItem
+            task={item}
+            onToggleCompletion={() =>
+              updateTaskMutation.mutate({
+                id: item.id,
+                completed: !item.completed,
+              })
+            }
+            onDeleteTask={() => onDeleteTask(item.id)}
+            onEditTask={() => onEditTask(item.id)}
+          />
+        )}
+        style={{marginTop: 20}}
+      />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#f0f0f0' },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
+  container: {flex: 1, padding: 20, backgroundColor: '#f0f0f0'},
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default App;

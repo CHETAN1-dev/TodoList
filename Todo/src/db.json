@@ -1,12 +1,6 @@
 {
   "tasks": [
     {
-      "id": "1",
-      "text": "Complete React Native project",
-      "completed": false,
-      "priority": "High"
-    },
-    {
       "id": "2",
       "text": "Review Redux documentation",
       "completed": false,

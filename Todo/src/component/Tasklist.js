@@ -4,7 +4,7 @@ import { FlatList } from 'react-native';
 import { useGetTasksQuery, useUpdateTaskMutation, useDeleteTaskMutation } from '../redux/api/taskApi';
 import TaskItem from '../component/Taskitem';
 
-const TaskList = () => {
+const TaskList = ({onEditTask}) => {
   const { data: tasks = [], refetch } = useGetTasksQuery();
   const [updateTask] = useUpdateTaskMutation();
   const [deleteTask] = useDeleteTaskMutation();
@@ -27,7 +27,9 @@ const TaskList = () => {
         <TaskItem
           task={item}
           onToggleCompletion={() => onToggleCompletion(item.id, item.completed)}
-          onDeleteTask={() => onDeleteTask(item.id)}
+          onDeleteTask={() => onDeleteTask(item.id)
+          }
+          onEditTask={() => onEditTask(item.id)}
         />
       )}
       style={{ marginTop: 20 }}

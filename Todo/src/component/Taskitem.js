@@ -12,7 +12,7 @@ const TaskItem = ({ task, onToggleCompletion, onDeleteTask , onEditTask}) => {
         <Text style={styles.priorityText}>Priority: {task.priority}</Text>
       </TouchableOpacity>
       <View style={styles.taskActions}>
-      <Button title="Edit" color="light blue" onPress={onEditTask}/>
+      <Button title="Edit" color="blue" onPress={onEditTask}/>
         <Button title="Delete" color="red" onPress={onDeleteTask} />
       </View>
     </View>
